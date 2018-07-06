@@ -1,6 +1,8 @@
 .idea/
 
 iter*.png
+f1*.png
+F1*
 data
 origin_data
 out
