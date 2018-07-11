@@ -1,5 +1,5 @@
 .idea/
-
+__pycache__
 iter*.png
 f1*.png
 F1*
