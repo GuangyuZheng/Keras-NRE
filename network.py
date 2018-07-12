@@ -1,7 +1,6 @@
 import tensorflow as tf
 from keras import backend as k
 from keras.layers import Embedding, concatenate, GRU, Bidirectional
-from custom_layers import WordLevelAttentionLayer, SentenceLevelAttentionLayer
 
 
 class Settings(object):
