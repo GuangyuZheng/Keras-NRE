@@ -100,7 +100,7 @@ class BGRU_2ATT:
             with k.name_scope('output'):
                 self.predictions.append(k.argmax(self.prob[i], 0, ))
             with k.name_scope('loss'):
-                self.loss.append(k.mean(k.categorical_crossentropy(sen_out[i], self.input_y[i], from_logits=True)))
+                self.loss.append(k.mean(k.categorical_crossentropy(self.input_y[i], sen_out[i], from_logits=True)))
                 self.total_loss += self.loss[i]
             with k.name_scope('accuracy'):
                 self.accuracy.append(k.cast(k.equal(self.predictions[i], k.argmax(self.input_y[i], 0)), 'float32'))

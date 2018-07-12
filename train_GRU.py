@@ -69,16 +69,9 @@ if __name__ == "__main__":
             accuracy = np.reshape(np.asarray(accuracy), (big_num,))
             acc = np.mean(accuracy)
 
-            '''
-            predictions = np.reshape(np.asarray(predictions), (big_num,))
-            for i in range(big_num):
-                print(str(predictions[i]) + " " + str(np.argmax(y_batch[i])))
-            '''
-
-            if step % 1 == 0:
+            if step % 50 == 0:
                 tempstr = "{}: step {}, softmax_loss {:g}, acc {:g}".format(time_str, step, loss, acc)
                 print(tempstr)
-
 
 
         for one_epoch in range(settings.num_epochs):
@@ -109,3 +102,10 @@ if __name__ == "__main__":
                 temp_y = np.array(temp_y)
 
                 train_one_step(temp_word, temp_pos1, temp_pos2, temp_y)
+
+                current_step = tf.train.global_step(sess, global_step)
+                if current_step > 9000 and current_step % 500 == 0:
+                    print('saving model')
+                    save_path = os.path.join(path_prefix, 'model', 'BGRU_2ATT_model')
+                    path = saver.save(sess, save_path, global_step=current_step)
+                    print('have saved model to ' + path)
