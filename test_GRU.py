@@ -21,6 +21,7 @@ if __name__ == '__main__':
 
     big_num_test = test_settings.big_num
 
+    tf.reset_default_graph()
     sess = tf.Session()
     k.set_session(sess)
     k.set_learning_phase(0)
@@ -105,14 +106,14 @@ if __name__ == '__main__':
                     correct_num_300 += 1.0
             print(correct_num_300 / 300)
 
-        with tf.variable_scope("model"):
-            mtest = network.BGRU_2ATT(is_training=False, word_embeddings=wordembedding, settings=test_settings)
+
+        mtest = network.BGRU_2ATT(is_training=False, word_embeddings=wordembedding, settings=test_settings)
 
         saver = tf.train.Saver()
 
         # ATTENTION: change the list to the iters you want to test !!
         # testlist = range(9025,14000,25)
-        testlist = [10900]
+        testlist = [50]
         for model_iter in testlist:
 
             saver.restore(sess, pathname + str(model_iter))

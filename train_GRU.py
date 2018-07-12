@@ -19,12 +19,15 @@ if __name__ == "__main__":
 
     big_num = settings.big_num
 
+    tf.reset_default_graph()
+
     sess = tf.Session()
     k.set_session(sess)
     k.set_learning_phase(1)
 
     with sess.as_default():
         model = network.BGRU_2ATT(is_training=True, word_embeddings=word_embedding, settings=settings)
+
         global_step = tf.Variable(0, name='global_step', trainable=False)
         optimizer = tf.train.AdamOptimizer(0.001)
 
@@ -106,7 +109,9 @@ if __name__ == "__main__":
 
                 current_step = tf.train.global_step(sess, global_step)
                 if current_step > 9000 and current_step % 500 == 0:
+                # if current_step == 50:
                     print('saving model')
                     save_path = os.path.join(path_prefix, 'model', 'BGRU_2ATT_model')
                     path = saver.save(sess, save_path, global_step=current_step)
                     print('have saved model to ' + path)
+                
