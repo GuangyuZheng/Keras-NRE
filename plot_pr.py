@@ -17,10 +17,10 @@ for i in range(len(filename)):
     plt.plot(recall, precision, color=color[i], lw=2, label=filename[i])
 
 # ATTENTION: put the model iters you want to plot into the list
-model_iter = [10900]
+model_iter = [16000]
 for one_iter in model_iter:
     y_true = np.load(os.path.join(path, 'data', 'allans.npy'))
-    y_scores = np.load(os.path.join(path, 'out', 'sample_allprob_iter_' + str(one_iter) + '.npy'))
+    y_scores = np.load(os.path.join(path, 'out', 'allprob_iter_' + str(one_iter) + '.npy'))
 
     precision, recall, threshold = precision_recall_curve(y_true, y_scores)
     average_precision = average_precision_score(y_true, y_scores)

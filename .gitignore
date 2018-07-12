@@ -1,7 +1,6 @@
 .idea/
 __pycache__
-iter*.png
-f1*.png
+*.png
 F1*
 data
 origin_data
