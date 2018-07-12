@@ -21,9 +21,10 @@ if __name__ == "__main__":
 
     sess = tf.Session()
     k.set_session(sess)
+    k.set_learning_phase(1)
 
     with sess.as_default():
-        model = network.BGRU_2ATT(word_embedding, settings)
+        model = network.BGRU_2ATT(is_training=True, word_embeddings=word_embedding, settings=settings)
         global_step = tf.Variable(0, name='global_step', trainable=False)
         optimizer = tf.train.AdamOptimizer(0.001)
 

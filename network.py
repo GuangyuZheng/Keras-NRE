@@ -20,7 +20,7 @@ class Settings(object):
 
 
 class BGRU_2ATT:
-    def __init__(self, word_embeddings, settings):
+    def __init__(self, is_training, word_embeddings, settings):
         self.num_steps = settings.num_steps
         self.num_classes = settings.num_classes
         self.word_embeddings = word_embeddings
@@ -37,9 +37,11 @@ class BGRU_2ATT:
                                          trainable=True)
         pos2_embedding_layer = Embedding(self.pos_num, self.pos_size, embeddings_initializer='glorot_uniform',
                                          trainable=True)
-
-        BGRU_layer = Bidirectional(GRU(units=self.gru_size, return_sequences=True, dropout=1 - self.keep_prob),
-                                   merge_mode='sum')
+        if is_training:
+            BGRU_layer = Bidirectional(GRU(units=self.gru_size, return_sequences=True, dropout=1 - self.keep_prob),
+                                       merge_mode='sum')
+        else:
+            BGRU_layer = Bidirectional(GRU(units=self.gru_size, return_sequences=True), merge_mode='sum')
 
         self.input_words = k.placeholder(dtype='int32', shape=[None, self.num_steps], name='input_words')
         self.input_pos1 = k.placeholder(dtype='int32', shape=[None, self.num_steps], name='input_pos1')
@@ -100,7 +102,7 @@ class BGRU_2ATT:
             with k.name_scope('output'):
                 self.predictions.append(k.argmax(self.prob[i], 0, ))
             with k.name_scope('loss'):
-                self.loss.append(k.mean(k.categorical_crossentropy(self.input_y[i], sen_out[i], from_logits=True)))
+                self.loss.append(k.mean(k.categorical_crossentropy(target=self.input_y[i], output=sen_out[i], from_logits=True)))
                 self.total_loss += self.loss[i]
             with k.name_scope('accuracy'):
                 self.accuracy.append(k.cast(k.equal(self.predictions[i], k.argmax(self.input_y[i], 0)), 'float32'))
