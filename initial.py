@@ -1,6 +1,8 @@
 import numpy as np
 import os
 
+path_prefix = os.getcwd()
+
 
 # embedding the position
 def pos_embed(x):
@@ -28,7 +30,7 @@ def init():
     print('reading word embedding data...')
     vec = []
     word2id = {}
-    f = open('./origin_data/vec.txt', 'r', encoding="utf-8")
+    f = open(os.path.join(path_prefix, 'origin_data', 'vec.txt'), 'r', encoding="utf-8")
     f.readline()
     while True:
         content = f.readline()
@@ -51,7 +53,7 @@ def init():
 
     print('reading relation to id')
     relation2id = {}
-    f = open('./origin_data/relation2id.txt', 'r')
+    f = open(os.path.join(path_prefix, 'origin_data', 'relation2id.txt'), 'r')
     while True:
         content = f.readline()
         if content == '':
@@ -69,7 +71,7 @@ def init():
     train_ans = {}  # {entity pair:[label1,label2,...]} the label is one-hot vector
 
     print('reading train data...')
-    f = open('./origin_data/train.txt', 'r')
+    f = open(os.path.join(path_prefix, 'origin_data', 'train.txt'), 'r')
 
     while True:
         content = f.readline()
@@ -145,7 +147,7 @@ def init():
     test_sen = {}  # {entity pair:[[sentence 1],[sentence 2]...]}
     test_ans = {}  # {entity pair:[labels,...]} the labels is N-hot vector (N is the number of multi-label)
 
-    f = open('./origin_data/test.txt', 'r')
+    f = open(os.path.join(path_prefix, 'origin_data', 'test.txt'), 'r')
 
     while True:
         content = f.readline()
@@ -207,7 +209,7 @@ def init():
     test_y = []
 
     print('organizing train data')
-    f = open('./data/train_q&a.txt', 'w')
+    f = open(os.path.join(path_prefix, 'data', 'train_q&a.txt'), 'w')
     temp = 0
     for i in train_sen:  # i -> entity pair
         if len(train_ans[i]) != len(train_sen[i]):
@@ -222,7 +224,7 @@ def init():
     f.close()
 
     print('organizing test data')
-    f = open('./data/test_q&a.txt', 'w')
+    f = open(os.path.join(path_prefix, 'data', 'test_q&a.txt'), 'w')
     temp = 0
     for i in test_sen:
         test_x.append(test_sen[i])
@@ -240,11 +242,11 @@ def init():
     test_x = np.array(test_x)
     test_y = np.array(test_y)
 
-    np.save('./data/vec.npy', vec)
-    np.save('./data/train_x.npy', train_x)
-    np.save('./data/train_y.npy', train_y)
-    np.save('./data/testall_x.npy', test_x)
-    np.save('./data/testall_y.npy', test_y)
+    np.save(os.path.join(path_prefix, 'data', 'vec.npy'), vec)
+    np.save(os.path.join(path_prefix, 'data', 'train_x.npy'), train_x)
+    np.save(os.path.join(path_prefix, 'data', 'train_y.npy'), train_y)
+    np.save(os.path.join(path_prefix, 'data', 'testall_x.npy'), test_x)
+    np.save(os.path.join(path_prefix, 'data', 'testall_y.npy'), test_y)
 
     # get test data for P@N evaluation, in which only entity pairs with more than 1 sentence exist
     print('get test data for p@n test')
@@ -287,17 +289,17 @@ def init():
     pall_test_x = np.array(pall_test_x)
     pall_test_y = np.array(pall_test_y)
 
-    np.save('./data/pone_test_x.npy', pone_test_x)
-    np.save('./data/pone_test_y.npy', pone_test_y)
-    np.save('./data/ptwo_test_x.npy', ptwo_test_x)
-    np.save('./data/ptwo_test_y.npy', ptwo_test_y)
-    np.save('./data/pall_test_x.npy', pall_test_x)
-    np.save('./data/pall_test_y.npy', pall_test_y)
+    np.save(os.path.join(path_prefix, 'data', 'pone_test_x.npy'), pone_test_x)
+    np.save(os.path.join(path_prefix, 'data', 'pone_test_y.npy'), pone_test_y)
+    np.save(os.path.join(path_prefix, 'data', 'ptwo_test_x.npy'), ptwo_test_x)
+    np.save(os.path.join(path_prefix, 'data', 'ptwo_test_y.npy'), ptwo_test_y)
+    np.save(os.path.join(path_prefix, 'data', 'pall_test_x.npy'), pall_test_x)
+    np.save(os.path.join(path_prefix, 'data', 'pall_test_y.npy'), pall_test_y)
 
 
 def seperate():
     print('reading training data')
-    x_train = np.load('./data/train_x.npy')
+    x_train = np.load(os.path.join(path_prefix, 'data', 'train_x.npy'))
 
     train_word = []
     train_pos1 = []
@@ -326,12 +328,12 @@ def seperate():
     train_word = np.array(train_word)
     train_pos1 = np.array(train_pos1)
     train_pos2 = np.array(train_pos2)
-    np.save('./data/train_word.npy', train_word)
-    np.save('./data/train_pos1.npy', train_pos1)
-    np.save('./data/train_pos2.npy', train_pos2)
+    np.save(os.path.join(path_prefix, 'data', 'train_word.npy'), train_word)
+    np.save(os.path.join(path_prefix, 'data', 'train_pos1.npy'), train_pos1)
+    np.save(os.path.join(path_prefix, 'data', 'train_pos2.npy'), train_pos2)
 
     print('reading p-one test data')
-    x_test = np.load('./data/pone_test_x.npy')
+    x_test = np.load(os.path.join(path_prefix, 'data', 'pone_test_x.npy'))
     print('seperating p-one test data')
     test_word = []
     test_pos1 = []
@@ -359,12 +361,12 @@ def seperate():
     test_word = np.array(test_word)
     test_pos1 = np.array(test_pos1)
     test_pos2 = np.array(test_pos2)
-    np.save('./data/pone_test_word.npy', test_word)
-    np.save('./data/pone_test_pos1.npy', test_pos1)
-    np.save('./data/pone_test_pos2.npy', test_pos2)
+    np.save(os.path.join(path_prefix, 'data', 'pone_test_word.npy'), test_word)
+    np.save(os.path.join(path_prefix, 'data', 'pone_test_pos1.npy'), test_pos1)
+    np.save(os.path.join(path_prefix, 'data', 'pone_test_pos2.npy'), test_pos2)
 
     print('reading p-two test data')
-    x_test = np.load('./data/ptwo_test_x.npy')
+    x_test = np.load(os.path.join(path_prefix, 'data', 'ptwo_test_x.npy'))
     print('seperating p-two test data')
     test_word = []
     test_pos1 = []
@@ -392,12 +394,12 @@ def seperate():
     test_word = np.array(test_word)
     test_pos1 = np.array(test_pos1)
     test_pos2 = np.array(test_pos2)
-    np.save('./data/ptwo_test_word.npy', test_word)
-    np.save('./data/ptwo_test_pos1.npy', test_pos1)
-    np.save('./data/ptwo_test_pos2.npy', test_pos2)
+    np.save(os.path.join(path_prefix, 'data', 'ptwo_test_word.npy'), test_word)
+    np.save(os.path.join(path_prefix, 'data', 'ptwo_test_pos1.npy'), test_pos1)
+    np.save(os.path.join(path_prefix, 'data', 'ptwo_test_pos2.npy'), test_pos2)
 
     print('reading p-all test data')
-    x_test = np.load('./data/pall_test_x.npy')
+    x_test = np.load(os.path.join(path_prefix, 'data', 'pall_test_x.npy'))
     print('seperating p-all test data')
     test_word = []
     test_pos1 = []
@@ -425,12 +427,12 @@ def seperate():
     test_word = np.array(test_word)
     test_pos1 = np.array(test_pos1)
     test_pos2 = np.array(test_pos2)
-    np.save('./data/pall_test_word.npy', test_word)
-    np.save('./data/pall_test_pos1.npy', test_pos1)
-    np.save('./data/pall_test_pos2.npy', test_pos2)
+    np.save(os.path.join(path_prefix, 'data', 'pall_test_word.npy'), test_word)
+    np.save(os.path.join(path_prefix, 'data', 'pall_test_pos1.npy'), test_pos1)
+    np.save(os.path.join(path_prefix, 'data', 'pall_test_pos2.npy'), test_pos2)
 
     print('seperating test all data')
-    x_test = np.load('./data/testall_x.npy')
+    x_test = np.load(os.path.join(path_prefix, 'data', 'testall_x.npy'))
 
     test_word = []
     test_pos1 = []
@@ -459,17 +461,17 @@ def seperate():
     test_pos1 = np.array(test_pos1)
     test_pos2 = np.array(test_pos2)
 
-    np.save('./data/testall_word.npy', test_word)
-    np.save('./data/testall_pos1.npy', test_pos1)
-    np.save('./data/testall_pos2.npy', test_pos2)
+    np.save(os.path.join(path_prefix, 'data', 'testall_word.npy'), test_word)
+    np.save(os.path.join(path_prefix, 'data', 'testall_pos1.npy'), test_pos1)
+    np.save(os.path.join(path_prefix, 'data', 'testall_pos2.npy'), test_pos2)
 
 
 def getsmall():
     print('reading training data')
-    word = np.load('./data/train_word.npy')
-    pos1 = np.load('./data/train_pos1.npy')
-    pos2 = np.load('./data/train_pos2.npy')
-    y = np.load('./data/train_y.npy')
+    word = np.load(os.path.join(path_prefix, 'data', 'train_word.npy'))
+    pos1 = np.load(os.path.join(path_prefix, 'data', 'train_pos1.npy'))
+    pos2 = np.load(os.path.join(path_prefix, 'data', 'train_pos2.npy'))
+    y = np.load(os.path.join(path_prefix, 'data', 'train_y.npy'))
 
     new_word = []
     new_pos1 = []
@@ -567,25 +569,25 @@ def getsmall():
     new_pos2 = np.array(new_pos2)
     new_y = np.array(new_y)
 
-    np.save('./data/small_word.npy', new_word)
-    np.save('./data/small_pos1.npy', new_pos1)
-    np.save('./data/small_pos2.npy', new_pos2)
-    np.save('./data/small_y.npy', new_y)
+    np.save(os.path.join(path_prefix, 'data', 'small_word.npy'), new_word)
+    np.save(os.path.join(path_prefix, 'data', 'small_pos1.npy'), new_pos1)
+    np.save(os.path.join(path_prefix, 'data', 'small_pos2.npy'), new_pos2)
+    np.save(os.path.join(path_prefix, 'data', 'small_y.npy'), new_y)
 
 
 # get answer metric for PR curve evaluation
 def getans():
-    test_y = np.load('./data/testall_y.npy')
+    test_y = np.load(os.path.join(path_prefix, 'data', 'testall_y.npy'))
     eval_y = []
     for i in test_y:
         eval_y.append(i[1:])
     allans = np.reshape(eval_y, (-1))
-    np.save('./data/allans.npy', allans)
+    np.save(os.path.join(path_prefix, 'data', 'allans.npy'), allans)
 
 
 def get_metadata():
-    fwrite = open('./data/metadata.tsv', 'w', encoding='utf-8')
-    f = open('./origin_data/vec.txt', 'r', encoding='utf-8')
+    fwrite = open(os.path.join(path_prefix, 'data', 'metadata.tsv'), 'w', encoding='utf-8')
+    f = open(os.path.join(path_prefix, 'origin_data', 'vec.txt'), 'r', encoding='utf-8')
     f.readline()
     while True:
         content = f.readline().strip()
