@@ -1,5 +1,7 @@
 from sklearn.metrics import precision_recall_curve
 from sklearn.metrics import average_precision_score
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -17,7 +19,7 @@ for i in range(len(filename)):
     plt.plot(recall, precision, color=color[i], lw=2, label=filename[i])
 
 # ATTENTION: put the model iters you want to plot into the list
-model_iter = [16000]
+model_iter = [13500]
 for one_iter in model_iter:
     y_true = np.load(os.path.join(path, 'data', 'allans.npy'))
     y_scores = np.load(os.path.join(path, 'out', 'allprob_iter_' + str(one_iter) + '.npy'))
