@@ -1,6 +1,6 @@
 # Neural Relation Extraction(NRE)
 ### This is a modified version, which is based on Keras with Tensorflow as backend.
-### Referential implementation: [thunlp/TensorFlow-NRE]( https://github.com/thunlp/TensorFlow-NRE)
+### Original implementation: [thunlp/TensorFlow-NRE]( https://github.com/thunlp/TensorFlow-NRE)
 Neural relation extraction aims to extract relations from plain text with neural models, which has been the state-of-the-art methods for relation extraction. In this project, we provide our implementations of a word-level and sentence-level combined Bidirectional GRU network (BGRU+2ATT).  
 
 We come up with the idea from the paper "Attention-Based Bidirectional Long Short-Term Memory Networks for Relation Classification" [Zhou et al.,2016] and the paper "Neural Relation Extraction with Selective Attention over Instances" [Lin et al.,2016]. And we compare our results with PCNN+ATT [Lin et al.,2016] on the same dataset.
