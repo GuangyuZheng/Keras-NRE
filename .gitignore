@@ -1,6 +1,6 @@
 .idea/
 __pycache__
-*.png
+pr*.png
 F1*
 data
 origin_data

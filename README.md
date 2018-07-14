@@ -1,5 +1,6 @@
 # Neural Relation Extraction(NRE)
-### This is a forked version, which is based on Keras with Tensorflow as backend
+### This is a modified version, which is based on Keras with Tensorflow as backend.
+### Referential implementation: [thunlp/TensorFlow-NRE]( https://github.com/thunlp/TensorFlow-NRE)
 Neural relation extraction aims to extract relations from plain text with neural models, which has been the state-of-the-art methods for relation extraction. In this project, we provide our implementations of a word-level and sentence-level combined Bidirectional GRU network (BGRU+2ATT).  
 
 We come up with the idea from the paper "Attention-Based Bidirectional Long Short-Term Memory Networks for Relation Classification" [Zhou et al.,2016] and the paper "Neural Relation Extraction with Selective Attention over Instances" [Lin et al.,2016]. And we compare our results with PCNN+ATT [Lin et al.,2016] on the same dataset.
@@ -48,9 +49,10 @@ The training model file will be saved in folder model/
 # Test
 For testing, you need to run the `test_GRU.py` to get all results on test dataset. BUT before you run it, you should change the pathname and modeliters you want to perform testing on in the test_GRU.py. We have add 'ATTENTION' to the code in `test_GRU.py` where you have to change before you test your own models.  
 
-As an example, we provide our best model in the model/ directory. You just need to type the following command:  
+<!-- As an example, we provide our best model in the model/ directory. -->
+You just need to type the following command:  
 `python3 test_GRU.py`  
-The testing results will be printed(mainly the P@N results and the area of PR curve) and the all results on test dataset will be saved in out/ directory with the prefix "sample"  
+The testing results will be printed(mainly the P@N results and the area of PR curve) and the all results on test dataset will be saved in out/ directory.
 
 To draw the PR curve for the sample model, you just need to type the following command:  
 `python3 plot_pr.py`  
