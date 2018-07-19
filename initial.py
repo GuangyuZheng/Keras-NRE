@@ -1,8 +1,12 @@
 import numpy as np
 import os
+from utils import construct_data
+import network
 
 path_prefix = os.getcwd()
 
+data_setting = network.Settings()
+sen_num = data_setting.sen_num
 
 # embedding the position
 def pos_embed(x):
@@ -50,6 +54,7 @@ def init():
     vec.append(np.random.normal(size=dim, loc=0, scale=0.05))
     vec.append(np.random.normal(size=dim, loc=0, scale=0.05))
     vec = np.array(vec, dtype=np.float32)
+    data_setting.vocab_size = len(vec)
 
     print('reading relation to id')
     relation2id = {}
@@ -64,6 +69,7 @@ def init():
 
     # length of sentence is 70
     fixlen = 70
+
     # max length of position embedding is 60 (-60~+60)
     maxlen = 60
 
@@ -361,6 +367,8 @@ def seperate():
     test_word = np.array(test_word)
     test_pos1 = np.array(test_pos1)
     test_pos2 = np.array(test_pos2)
+    test_word, test_pos1, temp_pos2 = construct_data(data_setting.sen_num, test_word, test_pos1, test_pos2,
+                                                        data_setting.vocab_size - 1, data_setting.num_steps)
     np.save(os.path.join(path_prefix, 'data', 'pone_test_word.npy'), test_word)
     np.save(os.path.join(path_prefix, 'data', 'pone_test_pos1.npy'), test_pos1)
     np.save(os.path.join(path_prefix, 'data', 'pone_test_pos2.npy'), test_pos2)
@@ -394,6 +402,8 @@ def seperate():
     test_word = np.array(test_word)
     test_pos1 = np.array(test_pos1)
     test_pos2 = np.array(test_pos2)
+    test_word, test_pos1, temp_pos2 = construct_data(data_setting.sen_num, test_word, test_pos1, test_pos2,
+                                                     data_setting.vocab_size - 1, data_setting.num_steps)
     np.save(os.path.join(path_prefix, 'data', 'ptwo_test_word.npy'), test_word)
     np.save(os.path.join(path_prefix, 'data', 'ptwo_test_pos1.npy'), test_pos1)
     np.save(os.path.join(path_prefix, 'data', 'ptwo_test_pos2.npy'), test_pos2)
@@ -427,6 +437,8 @@ def seperate():
     test_word = np.array(test_word)
     test_pos1 = np.array(test_pos1)
     test_pos2 = np.array(test_pos2)
+    test_word, test_pos1, temp_pos2 = construct_data(data_setting.sen_num, test_word, test_pos1, test_pos2,
+                                                     data_setting.vocab_size - 1, data_setting.num_steps)
     np.save(os.path.join(path_prefix, 'data', 'pall_test_word.npy'), test_word)
     np.save(os.path.join(path_prefix, 'data', 'pall_test_pos1.npy'), test_pos1)
     np.save(os.path.join(path_prefix, 'data', 'pall_test_pos2.npy'), test_pos2)
@@ -568,7 +580,8 @@ def getsmall():
     new_pos1 = np.array(new_pos1)
     new_pos2 = np.array(new_pos2)
     new_y = np.array(new_y)
-
+    new_word, new_pos1, new_pos2 = construct_data(data_setting.sen_num, new_word, new_pos1, new_pos2,
+                                                        data_setting.vocab_size - 1, data_setting.num_steps)
     np.save(os.path.join(path_prefix, 'data', 'small_word.npy'), new_word)
     np.save(os.path.join(path_prefix, 'data', 'small_pos1.npy'), new_pos1)
     np.save(os.path.join(path_prefix, 'data', 'small_pos2.npy'), new_pos2)
