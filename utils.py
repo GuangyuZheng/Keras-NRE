@@ -7,11 +7,11 @@ def construct_data(sen_num, words, pos1, pos2, blank, num_steps):
     train_pos1 = []
     train_pos2 = []
     if isinstance(words, type(np.array([0]))):
-        words.tolist()
+        words = words.tolist()
     if isinstance(pos1, type(np.array([0]))):
-        pos1.tolist()
+        pos1 = pos1.tolist()
     if isinstance(pos2, type(np.array([0]))):
-        pos2.tolist()
+        pos2 = pos2.tolist()
 
     for i in range(len(words)):
         sentence_set = words[i]
