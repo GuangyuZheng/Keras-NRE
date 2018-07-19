@@ -1,8 +1,18 @@
+import numpy as np
+
+
 # padding data with blank and zero or truncate data
 def construct_data(sen_num, words, pos1, pos2, blank, num_steps):
     train_words = []
     train_pos1 = []
     train_pos2 = []
+    if isinstance(words, type(np.array([0]))):
+        words.tolist()
+    if isinstance(pos1, type(np.array([0]))):
+        pos1.tolist()
+    if isinstance(pos2, type(np.array([0]))):
+        pos2.tolist()
+
     for i in range(len(words)):
         sentence_set = words[i]
         pos1_set = pos1[i]
