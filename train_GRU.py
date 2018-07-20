@@ -24,7 +24,7 @@ if __name__ == "__main__":
     # model.summary()
 
     print('begin training:')
-    model.fit([train_words[:500], train_pos1[:500], train_pos2[:500]], train_y[:500], epochs=settings.num_epochs, batch_size=settings.big_num)
+    model.fit([train_words, train_pos1, train_pos2], train_y, epochs=settings.num_epochs, batch_size=settings.big_num)
 
     save_path = os.path.join(path_prefix, 'model', 'my_model.h5')
     model.save_weights(save_path)
