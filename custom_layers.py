@@ -56,16 +56,16 @@ class SentenceLevelAttentionLayer(Layer):
     def call(self, inputs, **kwargs):
         sen_repre = k.tanh(inputs)  # sample, sen_num, gru_size
         # print(sen_repre.shape)
-        e = k.dot(tf.multiply(sen_repre, self.sen_a), self.sen_r)  # sample, sen_num
+        e = k.dot(tf.multiply(sen_repre, self.sen_a), self.sen_r)  # sample, sen_num, 1
         sen_alpha = k.exp(e)
-        sen_alpha /= k.cast(k.sum(sen_alpha, axis=1, keepdims=True) + k.epsilon(), k.floatx())  # sample, sen_num
-        sen_alpha = k.reshape(sen_alpha, k.shape(sen_alpha)[0:2])
+        sen_alpha /= k.cast(k.sum(sen_alpha, axis=1, keepdims=True) + k.epsilon(), k.floatx())  # sample, sen_num, 1
         # print(sen_alpha.shape)
-        sen_s = k.batch_dot(sen_alpha, sen_repre)  # sample, gru_size
-        # print(sen_s.shape)
+        sen_s = k.batch_dot(sen_alpha, sen_repre, axes=[0, 1])  # sample, gru_size
+        print(sen_s.shape)
         sen_out = tf.add(k.dot(sen_s, k.transpose(self.relation_embedding)), self.sen_d)
         sen_out = k.softmax(sen_out)
-        # print(sen_out.shape)
+        sen_out = k.reshape(sen_out, shape=(-1, self.num_classes))
+        print(sen_out.shape)
         return sen_out
 
     def compute_output_shape(self, input_shape):

@@ -4,6 +4,7 @@ import os
 import network
 from sklearn.metrics import average_precision_score
 from keras.models import load_model
+import network
 
 path_prefix = os.getcwd()
 # ATTENTION: change pathname before you load your model
@@ -14,7 +15,9 @@ test_settings.vocab_size = 114044
 test_settings.num_classes = 53
 test_settings.big_num = 262 * 9
 
-model = load_model(pathname)
+print(pathname)
+model = network.BGRU_2ATT(wordembedding, test_settings).model()
+model.load_weights(pathname)
 
 big_num_test = test_settings.big_num
 
@@ -23,9 +26,9 @@ big_num_test = test_settings.big_num
 def eval_pn(test_y, test_word, test_pos1, test_pos2, test_settings):
     allprob = []
     for i in range(int(len(test_word) / float(test_settings.big_num))):
-        prob = model.predict_on_batch(test_word[i * test_settings.big_num:(i + 1) * test_settings.big_num],
+        prob = model.predict_on_batch([test_word[i * test_settings.big_num:(i + 1) * test_settings.big_num],
                                    test_pos1[i * test_settings.big_num:(i + 1) * test_settings.big_num],
-                                   test_pos2[i * test_settings.big_num:(i + 1) * test_settings.big_num])
+                                   test_pos2[i * test_settings.big_num:(i + 1) * test_settings.big_num]])
         prob = np.reshape(np.array(prob), (test_settings.big_num, test_settings.num_classes))
         for single_prob in prob:
             allprob.append(single_prob[1:])
@@ -96,9 +99,9 @@ if __name__ == '__main__':
     allprob = []
     acc = []
     for i in range(int(len(test_word) / float(test_settings.big_num))):
-        prob = model.predict_on_batch(test_word[i * test_settings.big_num:(i + 1) * test_settings.big_num],
+        prob = model.predict_on_batch([test_word[i * test_settings.big_num:(i + 1) * test_settings.big_num],
                                    test_pos1[i * test_settings.big_num:(i + 1) * test_settings.big_num],
-                                   test_pos2[i * test_settings.big_num:(i + 1) * test_settings.big_num])
+                                   test_pos2[i * test_settings.big_num:(i + 1) * test_settings.big_num]])
         prob = np.reshape(np.array(prob), (test_settings.big_num, test_settings.num_classes))
         for single_prob in prob:
             allprob.append(single_prob[1:])

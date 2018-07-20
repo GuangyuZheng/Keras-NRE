@@ -47,8 +47,8 @@ class BGRU_2ATT:
                                          trainable=True)
         BGRU_layer = Bidirectional(GRU(units=self.gru_size, return_sequences=True, dropout=1 - self.keep_prob),
                                    merge_mode='sum')
-        flatten_layer = Lambda(self.flatten)
-        reshape_layer = Lambda(self.reshape)
+        flatten_layer = Lambda(self.flatten, name='flatten')
+        reshape_layer = Lambda(self.reshape, name='reshape')
 
         input_words = Input(shape=(self.sen_num, self.num_steps), name='input_words')
         input_pos1 = Input(shape=(self.sen_num, self.num_steps), name='input_pos1')

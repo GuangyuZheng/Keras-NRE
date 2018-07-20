@@ -367,7 +367,7 @@ def seperate():
     test_word = np.array(test_word)
     test_pos1 = np.array(test_pos1)
     test_pos2 = np.array(test_pos2)
-    test_word, test_pos1, temp_pos2 = construct_data(data_setting.sen_num, test_word, test_pos1, test_pos2,
+    test_word, test_pos1, test_pos2 = construct_data(data_setting.sen_num, test_word, test_pos1, test_pos2,
                                                         data_setting.vocab_size - 1, data_setting.num_steps)
     np.save(os.path.join(path_prefix, 'data', 'pone_test_word.npy'), test_word)
     np.save(os.path.join(path_prefix, 'data', 'pone_test_pos1.npy'), test_pos1)
@@ -402,7 +402,7 @@ def seperate():
     test_word = np.array(test_word)
     test_pos1 = np.array(test_pos1)
     test_pos2 = np.array(test_pos2)
-    test_word, test_pos1, temp_pos2 = construct_data(data_setting.sen_num, test_word, test_pos1, test_pos2,
+    test_word, test_pos1, test_pos2 = construct_data(data_setting.sen_num, test_word, test_pos1, test_pos2,
                                                      data_setting.vocab_size - 1, data_setting.num_steps)
     np.save(os.path.join(path_prefix, 'data', 'ptwo_test_word.npy'), test_word)
     np.save(os.path.join(path_prefix, 'data', 'ptwo_test_pos1.npy'), test_pos1)
@@ -437,7 +437,7 @@ def seperate():
     test_word = np.array(test_word)
     test_pos1 = np.array(test_pos1)
     test_pos2 = np.array(test_pos2)
-    test_word, test_pos1, temp_pos2 = construct_data(data_setting.sen_num, test_word, test_pos1, test_pos2,
+    test_word, test_pos1, test_pos2 = construct_data(data_setting.sen_num, test_word, test_pos1, test_pos2,
                                                      data_setting.vocab_size - 1, data_setting.num_steps)
     np.save(os.path.join(path_prefix, 'data', 'pall_test_word.npy'), test_word)
     np.save(os.path.join(path_prefix, 'data', 'pall_test_pos1.npy'), test_pos1)
@@ -473,6 +473,8 @@ def seperate():
     test_pos1 = np.array(test_pos1)
     test_pos2 = np.array(test_pos2)
 
+    test_word, test_pos1, test_pos2 = construct_data(data_setting.sen_num, test_word, test_pos1, test_pos2,
+                                                     data_setting.vocab_size - 1, data_setting.num_steps)
     np.save(os.path.join(path_prefix, 'data', 'testall_word.npy'), test_word)
     np.save(os.path.join(path_prefix, 'data', 'testall_pos1.npy'), test_pos1)
     np.save(os.path.join(path_prefix, 'data', 'testall_pos2.npy'), test_pos2)
