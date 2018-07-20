@@ -61,11 +61,11 @@ class SentenceLevelAttentionLayer(Layer):
         sen_alpha /= k.cast(k.sum(sen_alpha, axis=1, keepdims=True) + k.epsilon(), k.floatx())  # sample, sen_num, 1
         # print(sen_alpha.shape)
         sen_s = k.batch_dot(sen_alpha, sen_repre, axes=[0, 1])  # sample, gru_size
-        print(sen_s.shape)
+        # print(sen_s.shape)
         sen_out = tf.add(k.dot(sen_s, k.transpose(self.relation_embedding)), self.sen_d)
         sen_out = k.softmax(sen_out)
         sen_out = k.reshape(sen_out, shape=(-1, self.num_classes))
-        print(sen_out.shape)
+        # print(sen_out.shape)
         return sen_out
 
     def compute_output_shape(self, input_shape):
