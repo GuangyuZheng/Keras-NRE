@@ -15,7 +15,7 @@ class Settings(object):
         self.num_layers = 1
         self.pos_size = 5  # position embeddings
         self.pos_num = 123
-        self.sen_num = 10  # sentence number for relation extraction
+        self.sen_num = 20  # sentence number for relation extraction
         # the number of entity pairs of each batch during training or testing
         self.big_num = 50
 
@@ -40,7 +40,7 @@ class BGRU_2ATT:
 
     def model(self):
         words_embedding_layer = Embedding(len(self.word_embeddings), len(self.word_embeddings[0]), weights=[self.
-                                          word_embeddings], trainable=False)
+                                          word_embeddings], trainable=True)
         pos1_embedding_layer = Embedding(self.pos_num, self.pos_size, embeddings_initializer='glorot_uniform',
                                          trainable=True)
         pos2_embedding_layer = Embedding(self.pos_num, self.pos_size, embeddings_initializer='glorot_uniform',

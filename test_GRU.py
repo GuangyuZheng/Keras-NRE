@@ -25,19 +25,18 @@ big_num_test = test_settings.big_num
 # evaluate p@n
 def eval_pn(test_y, test_word, test_pos1, test_pos2, test_settings):
     allprob = []
-    for i in range(int(len(test_word) / float(test_settings.big_num))):
-        prob = model.predict_on_batch([test_word[i * test_settings.big_num:(i + 1) * test_settings.big_num],
-                                   test_pos1[i * test_settings.big_num:(i + 1) * test_settings.big_num],
-                                   test_pos2[i * test_settings.big_num:(i + 1) * test_settings.big_num]])
-        prob = np.reshape(np.array(prob), (test_settings.big_num, test_settings.num_classes))
-        for single_prob in prob:
-            allprob.append(single_prob[1:])
+    predict_result  = model.predict([test_word, test_pos1, test_pos2], batch_size=32)
+
+    for i in predict_result:
+        allprob.append(i[1:])
     allprob = np.reshape(np.array(allprob), (-1))
     eval_y = []
     for i in test_y:
         eval_y.append(i[1:])
     allans = np.reshape(eval_y, (-1))
     order = np.argsort(-allprob)
+    
+    assert allans.shape == order.shape
 
     print('P@100:')
     top100 = order[:100]
@@ -96,17 +95,20 @@ if __name__ == '__main__':
     test_word = np.load(os.path.join(path_prefix, 'data', 'testall_word.npy'))
     test_pos1 = np.load(os.path.join(path_prefix, 'data', 'testall_pos1.npy'))
     test_pos2 = np.load(os.path.join(path_prefix, 'data', 'testall_pos2.npy'))
+
     allprob = []
-    acc = []
-    for i in range(int(len(test_word) / float(test_settings.big_num))):
-        prob = model.predict_on_batch([test_word[i * test_settings.big_num:(i + 1) * test_settings.big_num],
-                                   test_pos1[i * test_settings.big_num:(i + 1) * test_settings.big_num],
-                                   test_pos2[i * test_settings.big_num:(i + 1) * test_settings.big_num]])
-        prob = np.reshape(np.array(prob), (test_settings.big_num, test_settings.num_classes))
-        for single_prob in prob:
-            allprob.append(single_prob[1:])
+    predict_result  = model.predict([test_word, test_pos1, test_pos2], batch_size=32)
+
+    for i in predict_result:
+        allprob.append(i[1:])
     allprob = np.reshape(np.array(allprob), (-1))
+    eval_y = []
+    for i in test_y:
+        eval_y.append(i[1:])
+    allans = np.reshape(eval_y, (-1))
     order = np.argsort(-allprob)
+    
+    assert allans.shape == order.shape
 
     print('saving all test result...')
     # ATTENTION: change the save path before you save your result !!
