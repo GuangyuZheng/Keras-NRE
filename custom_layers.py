@@ -1,7 +1,6 @@
 import tensorflow as tf
 from keras import backend as k
 from keras.engine.topology import Layer
-import numpy as np
 
 
 # input shape: total_num, num_steps, gru_size

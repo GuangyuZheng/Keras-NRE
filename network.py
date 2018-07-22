@@ -2,6 +2,7 @@ from keras import backend as k
 from keras.models import Model
 from keras.layers import Input, Embedding, GRU, Bidirectional, concatenate, Lambda
 from custom_layers import WordLevelAttentionLayer, SentenceLevelAttentionLayer
+from keras import regularizers
 
 
 class Settings(object):
@@ -18,6 +19,8 @@ class Settings(object):
         self.sen_num = 20  # sentence number for relation extraction
         # the number of entity pairs of each batch during training or testing
         self.big_num = 50
+        # penalty for regularizer
+        self.penalty_rate = 0.0001
 
 
 class BGRU_2ATT:
@@ -31,6 +34,7 @@ class BGRU_2ATT:
         self.keep_prob = settings.keep_prob
         self.big_num = settings.big_num
         self.sen_num = settings.sen_num
+        self.rate = settings.penalty_rate
 
     def flatten(self, x):
         return k.reshape(x, shape=(-1, self.num_steps))
@@ -39,14 +43,23 @@ class BGRU_2ATT:
         return k.reshape(x, shape=(-1, self.sen_num, self.gru_size))
 
     def model(self):
-        words_embedding_layer = Embedding(len(self.word_embeddings), len(self.word_embeddings[0]), weights=[self.
-                                          word_embeddings], trainable=True)
+        words_embedding_layer = Embedding(len(self.word_embeddings), len(self.word_embeddings[0]),
+                                          weights=[self.word_embeddings], trainable=True,
+                                          embeddings_regularizer=regularizers.l2(self.rate),
+                                          activity_regularizer=regularizers.l2(self.rate))
+
         pos1_embedding_layer = Embedding(self.pos_num, self.pos_size, embeddings_initializer='glorot_uniform',
-                                         trainable=True)
+                                         trainable=True, embeddings_regularizer=regularizers.l2(self.rate),
+                                         activity_regularizer=regularizers.l2(self.rate))
+
         pos2_embedding_layer = Embedding(self.pos_num, self.pos_size, embeddings_initializer='glorot_uniform',
-                                         trainable=True)
-        BGRU_layer = Bidirectional(GRU(units=self.gru_size, return_sequences=True, dropout=1 - self.keep_prob),
-                                   merge_mode='sum')
+                                         trainable=True, embeddings_regularizer=regularizers.l2(self.rate),
+                                         activity_regularizer=regularizers.l2(self.rate))
+
+        BGRU_layer = Bidirectional(GRU(units=self.gru_size, return_sequences=True, dropout=1 - self.keep_prob,
+                                       kernel_regularizer=regularizers.l2(self.rate), bias_regularizer=regularizers.l2(self.rate),
+                                       activity_regularizer=regularizers.l2(self.rate)), merge_mode='sum')
+
         flatten_layer = Lambda(self.flatten, name='flatten')
         reshape_layer = Lambda(self.reshape, name='reshape')
 
