@@ -28,14 +28,20 @@ def construct_data(sen_num, words, pos1, pos2, blank, num_steps):
                 pos1_set.append(zero_pos1)
                 pos2_set.append(zero_pos2)
                 j += 1
+            train_words.append(sentence_set)
+            train_pos1.append(pos1_set)
+            train_pos2.append(pos2_set)
         else:
             index = list(range(len(sentence_set)))
-            sample_index = random.choice(index, sen_num)
+            sample_index = random.sample(index, sen_num)
+            sample_sentence_set = []
+            sample_pos1_set = []
+            sample_pos2_set = []
             for idx in sample_index:
-                sentence_set = sentence_set[idx]
-                pos1_set = pos1_set[idx]
-                pos2_set = pos2_set[idx]
-        train_words.append(sentence_set)
-        train_pos1.append(pos1_set)
-        train_pos2.append(pos2_set)
+                sample_sentence_set.append(sentence_set[idx])
+                sample_pos1_set.append(pos1_set[idx])
+                sample_pos2_set.append(pos2_set[idx])
+            train_words.append(sample_sentence_set)
+            train_pos1.append(sample_pos1_set)
+            train_pos2.append(sample_pos2_set)
     return train_words, train_pos1, train_pos2
