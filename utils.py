@@ -1,4 +1,5 @@
 import numpy as np
+import random
 
 
 # padding data with blank and zero or truncate data
@@ -28,9 +29,12 @@ def construct_data(sen_num, words, pos1, pos2, blank, num_steps):
                 pos2_set.append(zero_pos2)
                 j += 1
         else:
-            sentence_set = sentence_set[:sen_num]
-            pos1_set = pos1_set[:sen_num]
-            pos2_set = pos2_set[:sen_num]
+            index = list(range(len(sentence_set)))
+            sample_index = random.choice(index, sen_num)
+            for idx in sample_index:
+                sentence_set = sentence_set[idx]
+                pos1_set = pos1_set[idx]
+                pos2_set = pos2_set[idx]
         train_words.append(sentence_set)
         train_pos1.append(pos1_set)
         train_pos2.append(pos2_set)
