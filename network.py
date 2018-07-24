@@ -45,16 +45,21 @@ class BGRU_2ATT:
     def model(self):
         words_embedding_layer = Embedding(len(self.word_embeddings), len(self.word_embeddings[0]),
                                           weights=[self.word_embeddings], trainable=True,
-                                          embeddings_regularizer=regularizers.l2(self.rate))
+                                          embeddings_regularizer=regularizers.l2(self.rate),
+                                          activity_regularizer=regularizers.l2(self.rate))
 
         pos1_embedding_layer = Embedding(self.pos_num, self.pos_size, embeddings_initializer='glorot_uniform',
-                                         trainable=True, embeddings_regularizer=regularizers.l2(self.rate))
+                                         trainable=True, embeddings_regularizer=regularizers.l2(self.rate),
+                                         activity_regularizer=regularizers.l2(self.rate))
 
         pos2_embedding_layer = Embedding(self.pos_num, self.pos_size, embeddings_initializer='glorot_uniform',
-                                         trainable=True, embeddings_regularizer=regularizers.l2(self.rate))
+                                         trainable=True, embeddings_regularizer=regularizers.l2(self.rate),
+                                         activity_regularizer=regularizers.l2(self.rate))
 
         BGRU_layer = Bidirectional(GRU(units=self.gru_size, return_sequences=True, dropout=1 - self.keep_prob,
-                                       kernel_regularizer=regularizers.l2(self.rate), bias_regularizer=regularizers.l2(self.rate)), merge_mode='sum')
+                                       kernel_regularizer=regularizers.l2(self.rate),
+                                       bias_regularizer=regularizers.l2(self.rate),
+                                       activity_regularizer=regularizers.l2(self.rate)), merge_mode='sum')
 
         flatten_layer = Lambda(self.flatten, name='flatten')
         reshape_layer = Lambda(self.reshape, name='reshape')
