@@ -18,6 +18,8 @@ settings.num_classes = len(train_y[0])
 
 BGRU_2ATT = network.BGRU_2ATT(word_embedding, settings)
 model = BGRU_2ATT.model()
+#previous_weight = os.path.join(path_prefix, 'model', 'my_model.h5')
+#model.load_weights(previous_weight)
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
 if __name__ == "__main__":
