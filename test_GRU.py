@@ -60,10 +60,10 @@ def eval_pn(test_y, test_word, test_pos1, test_pos2):
 
 
 if __name__ == '__main__':
-    testlist = [50]
-    # testlist = range(9500, 17501, 500)
+    # ATTENTION: change pathname before you load your model
+    # testlist = [50]
+    testlist = range(9500, 17501, 500)
     for model_iter in testlist:
-        # ATTENTION: change pathname before you load your model
         pathname = os.path.join(path_prefix, 'model', 'my_model-'+str(model_iter)+'.h5')
         model.load_weights(pathname)
         print("Evaluating P@N for iter " + str(model_iter))

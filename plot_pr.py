@@ -11,17 +11,18 @@ path = os.getcwd()
 print(path)
 
 plt.clf()
-filename = ['CNN+ATT', 'Hoffmann', 'MIMLRE', 'Mintz', 'PCNN+ATT']
-color = ['red', 'turquoise', 'darkorange', 'cornflowerblue', 'teal']
-for i in range(len(filename)):
-    precision = np.load(os.path.join(path, 'data', filename[i] + '_precision.npy'))
-    recall = np.load(os.path.join(path, 'data', filename[i] + '_recall.npy'))
-    plt.plot(recall, precision, color=color[i], lw=2, label=filename[i])
 
 # ATTENTION: put the model you want to plot
 # model_iter = [50]
 model_iter = range(9500, 17501, 500)
 for one_iter in model_iter:
+    filename = ['CNN+ATT', 'Hoffmann', 'MIMLRE', 'Mintz', 'PCNN+ATT']
+    color = ['red', 'turquoise', 'darkorange', 'cornflowerblue', 'teal']
+    for i in range(len(filename)):
+        precision = np.load(os.path.join(path, 'data', filename[i] + '_precision.npy'))
+        recall = np.load(os.path.join(path, 'data', filename[i] + '_recall.npy'))
+        plt.plot(recall, precision, color=color[i], lw=2, label=filename[i])
+
     y_true = np.load(os.path.join(path, 'data', 'allans.npy'))
     y_scores = np.load(os.path.join(path, 'out', 'allprob-'+str(one_iter)+'.npy'))
 

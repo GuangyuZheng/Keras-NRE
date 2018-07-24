@@ -29,7 +29,7 @@ def construct_data(sen_num, words, pos1, pos2, blank, num_steps):
                 pos2_set.append(zero_pos2)
                 j += 1
             indices = np.arange(len(sentence_set))
-            np.random.shuffle(indices)
+            #  np.random.shuffle(indices)
             shuffle_sentence_set = []
             shuffle_pos1_set = []
             shuffle_pos2_set = []
