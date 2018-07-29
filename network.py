@@ -38,7 +38,7 @@ class BGRU_2ATT:
         self.rate = settings.penalty_rate
 
     def flatten(self, x):
-        return k.reshape(x, shape=(-1, self.num_steps))
+        return k.reshape(x, shape=(-1, self.num_steps, k.int_shape(x)[-1]))
 
     def reshape(self, x):
         return k.reshape(x, shape=(self.big_num, self.sen_num, self.num_steps, self.gru_size))
@@ -71,8 +71,9 @@ class BGRU_2ATT:
         concat_embedding = concatenate([words_embedding, pos1_embedding, pos2_embedding])  # N, sen_num, steps, d
         # print(concat_embedding.shape)
 
-        output_h = TimeDistributed(BGRU_layer)(concat_embedding)  # N, sen_num, step, gru_size
-        # output_h = Lambda(self.reshape, name='reshape')(output_h)  # N, sen_num, step, gru_size
+        concat_embedding = Lambda(self.flatten)(concat_embedding)
+        output_h = BGRU_layer(concat_embedding)  # N * sen_num, step, gru_size
+        output_h = Lambda(self.reshape, name='reshape')(output_h)  # N, sen_num, step, gru_size
         # print(output_h.shape)
 
         attention_r = WordLevelAttentionLayer()(output_h)
