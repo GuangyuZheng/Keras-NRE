@@ -18,7 +18,6 @@ class WordLevelAttentionLayer(Layer):
 
     def call(self, inputs, **kwargs):
         # print(k.int_shape(inputs))
-        batch_size = k.int_shape(inputs)[0]
         sen_num = k.int_shape(inputs)[1]
         inputs = k.reshape(inputs, shape=(-1, k.int_shape(inputs)[-2], k.int_shape(inputs)[-1]))
         self.total_num = k.shape(inputs)[0]
@@ -28,7 +27,7 @@ class WordLevelAttentionLayer(Layer):
         tmp = k.reshape(k.dot(m, self.attention_w), shape=[self.total_num, self.num_steps])
         alpha = k.reshape(k.softmax(tmp), shape=[self.total_num, 1, self.num_steps])
         r = k.batch_dot(alpha, inputs)
-        attention_r = k.reshape(r, shape=(batch_size, sen_num, self.gru_size))
+        attention_r = k.reshape(r, shape=(-1, sen_num, self.gru_size))
         # print(type(attention_r))
         return attention_r
 

@@ -41,7 +41,7 @@ class BGRU_2ATT:
         return k.reshape(x, shape=(-1, self.num_steps, k.int_shape(x)[-1]))
 
     def reshape(self, x):
-        return k.reshape(x, shape=(self.big_num, self.sen_num, self.num_steps, self.gru_size))
+        return k.reshape(x, shape=(-1, self.sen_num, self.num_steps, self.gru_size))
 
     def model(self):
         words_embedding_layer = Embedding(len(self.word_embeddings), len(self.word_embeddings[0]),
@@ -56,9 +56,9 @@ class BGRU_2ATT:
         BGRU_layer = Bidirectional(GRU(units=self.gru_size, return_sequences=True, dropout=1 - self.keep_prob,
                                        kernel_regularizer=regularizers.l2(self.rate),
                                        bias_regularizer=regularizers.l2(self.rate)), merge_mode='sum')
-        input_words = Input(batch_shape=(self.big_num, self.sen_num, self.num_steps), name='input_words')
-        input_pos1 = Input(batch_shape=(self.big_num, self.sen_num, self.num_steps), name='input_pos1')
-        input_pos2 = Input(batch_shape=(self.big_num, self.sen_num, self.num_steps), name='input_pos2')
+        input_words = Input(shape=(self.sen_num, self.num_steps), name='input_words')
+        input_pos1 = Input(shape=(self.sen_num, self.num_steps), name='input_pos1')
+        input_pos2 = Input(shape=(self.sen_num, self.num_steps), name='input_pos2')
         # self.input_y = Input(shape=(self.num_classes,), name='input_y')
 
         input_words_mask = Masking(mask_value=-1, name='mask_word')(input_words)
