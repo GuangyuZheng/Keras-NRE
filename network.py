@@ -1,6 +1,7 @@
 from keras import backend as k
 from keras.models import Model
-from keras.layers import Input, Embedding, GRU, Bidirectional, concatenate, Lambda, LSTM
+from keras.layers import Input, Embedding, GRU, Bidirectional, concatenate, Lambda, Masking, Reshape
+from keras.layers import TimeDistributed
 from custom_layers import WordLevelAttentionLayer, SentenceLevelAttentionLayer
 from keras import regularizers
 
@@ -16,7 +17,7 @@ class Settings(object):
         self.num_layers = 1
         self.pos_size = 5  # position embeddings
         self.pos_num = 123
-        self.sen_num = 10  # sentence number for relation extraction
+        self.sen_num = 10  # max sentence number for relation extraction
         # the number of entity pairs of each batch during training or testing
         self.big_num = 50
         # penalty for regularizer
@@ -40,54 +41,47 @@ class BGRU_2ATT:
         return k.reshape(x, shape=(-1, self.num_steps))
 
     def reshape(self, x):
-        return k.reshape(x, shape=(-1, self.sen_num, self.gru_size))
+        return k.reshape(x, shape=(self.big_num, self.sen_num, self.num_steps, self.gru_size))
 
     def model(self):
         words_embedding_layer = Embedding(len(self.word_embeddings), len(self.word_embeddings[0]),
-                                          weights=[self.word_embeddings], trainable=True,
-                                          embeddings_regularizer=regularizers.l2(self.rate),
-                                          activity_regularizer=regularizers.l2(self.rate))
+                                          weights=[self.word_embeddings], trainable=False)
 
         pos1_embedding_layer = Embedding(self.pos_num, self.pos_size, embeddings_initializer='glorot_uniform',
-                                         trainable=True, embeddings_regularizer=regularizers.l2(self.rate),
-                                         activity_regularizer=regularizers.l2(self.rate))
+                                         trainable=True, embeddings_regularizer=regularizers.l2(self.rate))
 
         pos2_embedding_layer = Embedding(self.pos_num, self.pos_size, embeddings_initializer='glorot_uniform',
-                                         trainable=True, embeddings_regularizer=regularizers.l2(self.rate),
-                                         activity_regularizer=regularizers.l2(self.rate))
+                                         trainable=True, embeddings_regularizer=regularizers.l2(self.rate))
 
         BGRU_layer = Bidirectional(GRU(units=self.gru_size, return_sequences=True, dropout=1 - self.keep_prob,
                                        kernel_regularizer=regularizers.l2(self.rate),
-                                       bias_regularizer=regularizers.l2(self.rate),
-                                       activity_regularizer=regularizers.l2(self.rate)), merge_mode='sum')
-
-        flatten_layer = Lambda(self.flatten, name='flatten')
-        reshape_layer = Lambda(self.reshape, name='reshape')
-
-        input_words = Input(shape=(self.sen_num, self.num_steps), name='input_words')
-        input_pos1 = Input(shape=(self.sen_num, self.num_steps), name='input_pos1')
-        input_pos2 = Input(shape=(self.sen_num, self.num_steps), name='input_pos2')
+                                       bias_regularizer=regularizers.l2(self.rate)), merge_mode='sum')
+        input_words = Input(batch_shape=(self.big_num, self.sen_num, self.num_steps), name='input_words')
+        input_pos1 = Input(batch_shape=(self.big_num, self.sen_num, self.num_steps), name='input_pos1')
+        input_pos2 = Input(batch_shape=(self.big_num, self.sen_num, self.num_steps), name='input_pos2')
         # self.input_y = Input(shape=(self.num_classes,), name='input_y')
 
-        input_words_flatten = flatten_layer(input_words)
-        input_pos1_flatten = flatten_layer(input_pos1)
-        input_pos2_flatten = flatten_layer(input_pos2)
+        input_words_mask = Masking(mask_value=-1, name='mask_word')(input_words)
+        input_pos1_mask = Masking(mask_value=-1, name='mask_pos1')(input_pos1)
+        input_pos2_mask = Masking(mask_value=-1, name='mask_pos2')(input_pos2)
 
-        words_embedding = words_embedding_layer(input_words_flatten)
-        pos1_embedding = pos1_embedding_layer(input_pos1_flatten)
-        pos2_embedding = pos2_embedding_layer(input_pos2_flatten)
-        concat_embedding = concatenate([words_embedding, pos1_embedding, pos2_embedding])
+        words_embedding = words_embedding_layer(input_words_mask)
+        pos1_embedding = pos1_embedding_layer(input_pos1_mask)
+        pos2_embedding = pos2_embedding_layer(input_pos2_mask)
+        concat_embedding = concatenate([words_embedding, pos1_embedding, pos2_embedding])  # N, sen_num, steps, d
         # print(concat_embedding.shape)
 
-        output_h = BGRU_layer(concat_embedding)
+        output_h = TimeDistributed(BGRU_layer)(concat_embedding)  # N, sen_num, step, gru_size
+        # output_h = Lambda(self.reshape, name='reshape')(output_h)  # N, sen_num, step, gru_size
         # print(output_h.shape)
 
         attention_r = WordLevelAttentionLayer()(output_h)
-
-        attention_r = reshape_layer(attention_r)
         # print(attention_r.shape)
 
-        sen_out = SentenceLevelAttentionLayer(self.big_num, self.num_classes)(attention_r)
+        # attention_r = Reshape(target_shape=(self.sen_num, self.gru_size))(attention_r)
+        # print(attention_r.shape)
+
+        sen_out = SentenceLevelAttentionLayer(self.num_classes)(attention_r)
 
         # print('sen out shape:')
         # print(sen_out.shape)

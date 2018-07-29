@@ -7,6 +7,8 @@ path_prefix = os.getcwd()
 
 data_setting = network.Settings()
 sen_num = data_setting.sen_num
+padding_id = -1
+
 
 # embedding the position
 def pos_embed(x):
@@ -48,13 +50,13 @@ def init():
     f.close()
     word2id['UNK'] = len(word2id)
     word2id['BLANK'] = len(word2id)
+    # padding_id = word2id['BLANK']
 
     dim = 50
     # add embedding for UNK and BLANK
     vec.append(np.random.normal(size=dim, loc=0, scale=0.05))
     vec.append(np.random.normal(size=dim, loc=0, scale=0.05))
     vec = np.array(vec, dtype=np.float32)
-    data_setting.vocab_size = len(vec)
 
     print('reading relation to id')
     relation2id = {}
@@ -368,7 +370,7 @@ def seperate():
     test_pos1 = np.array(test_pos1)
     test_pos2 = np.array(test_pos2)
     test_word, test_pos1, test_pos2 = construct_data(data_setting.sen_num, test_word, test_pos1, test_pos2,
-                                                        data_setting.vocab_size - 1, data_setting.num_steps)
+                                                     padding_id, data_setting.num_steps)
     np.save(os.path.join(path_prefix, 'data', 'pone_test_word.npy'), test_word)
     np.save(os.path.join(path_prefix, 'data', 'pone_test_pos1.npy'), test_pos1)
     np.save(os.path.join(path_prefix, 'data', 'pone_test_pos2.npy'), test_pos2)
@@ -403,7 +405,7 @@ def seperate():
     test_pos1 = np.array(test_pos1)
     test_pos2 = np.array(test_pos2)
     test_word, test_pos1, test_pos2 = construct_data(data_setting.sen_num, test_word, test_pos1, test_pos2,
-                                                     data_setting.vocab_size - 1, data_setting.num_steps)
+                                                     padding_id, data_setting.num_steps)
     np.save(os.path.join(path_prefix, 'data', 'ptwo_test_word.npy'), test_word)
     np.save(os.path.join(path_prefix, 'data', 'ptwo_test_pos1.npy'), test_pos1)
     np.save(os.path.join(path_prefix, 'data', 'ptwo_test_pos2.npy'), test_pos2)
@@ -438,7 +440,7 @@ def seperate():
     test_pos1 = np.array(test_pos1)
     test_pos2 = np.array(test_pos2)
     test_word, test_pos1, test_pos2 = construct_data(data_setting.sen_num, test_word, test_pos1, test_pos2,
-                                                     data_setting.vocab_size - 1, data_setting.num_steps)
+                                                     padding_id, data_setting.num_steps)
     np.save(os.path.join(path_prefix, 'data', 'pall_test_word.npy'), test_word)
     np.save(os.path.join(path_prefix, 'data', 'pall_test_pos1.npy'), test_pos1)
     np.save(os.path.join(path_prefix, 'data', 'pall_test_pos2.npy'), test_pos2)
@@ -474,7 +476,7 @@ def seperate():
     test_pos2 = np.array(test_pos2)
 
     test_word, test_pos1, test_pos2 = construct_data(data_setting.sen_num, test_word, test_pos1, test_pos2,
-                                                     data_setting.vocab_size - 1, data_setting.num_steps)
+                                                     padding_id, data_setting.num_steps)
     np.save(os.path.join(path_prefix, 'data', 'testall_word.npy'), test_word)
     np.save(os.path.join(path_prefix, 'data', 'testall_pos1.npy'), test_pos1)
     np.save(os.path.join(path_prefix, 'data', 'testall_pos2.npy'), test_pos2)
@@ -583,11 +585,28 @@ def getsmall():
     new_pos2 = np.array(new_pos2)
     new_y = np.array(new_y)
     new_word, new_pos1, new_pos2 = construct_data(data_setting.sen_num, new_word, new_pos1, new_pos2,
-                                                        data_setting.vocab_size - 1, data_setting.num_steps)
-    np.save(os.path.join(path_prefix, 'data', 'small_word.npy'), new_word)
-    np.save(os.path.join(path_prefix, 'data', 'small_pos1.npy'), new_pos1)
-    np.save(os.path.join(path_prefix, 'data', 'small_pos2.npy'), new_pos2)
-    np.save(os.path.join(path_prefix, 'data', 'small_y.npy'), new_y)
+                                                  padding_id, data_setting.num_steps)
+    shuffle_new_word = []
+    shuffle_new_pos1 = []
+    shuffle_new_pos2 = []
+    shuffle_new_y = []
+    indices = list(range(len(new_word)))
+    np.random.shuffle(indices)
+    for i in indices:
+        shuffle_new_word.append(new_word[i])
+        shuffle_new_pos1.append(new_pos1[i])
+        shuffle_new_pos2.append(new_pos2[i])
+        shuffle_new_y.append(new_y[i])
+
+    shuffle_new_word = np.array(shuffle_new_word)
+    shuffle_new_pos1 = np.array(shuffle_new_pos1)
+    shuffle_new_pos2 = np.array(shuffle_new_pos2)
+    shuffle_new_y = np.array(shuffle_new_y)
+
+    np.save(os.path.join(path_prefix, 'data', 'small_word.npy'), shuffle_new_word)
+    np.save(os.path.join(path_prefix, 'data', 'small_pos1.npy'), shuffle_new_pos1)
+    np.save(os.path.join(path_prefix, 'data', 'small_pos2.npy'), shuffle_new_pos2)
+    np.save(os.path.join(path_prefix, 'data', 'small_y.npy'), shuffle_new_y)
 
 
 # get answer metric for PR curve evaluation
