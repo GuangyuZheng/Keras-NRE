@@ -111,7 +111,7 @@ if __name__ == '__main__':
 
     print('saving all test result...')
     # ATTENTION: change the save path before you save your result !!
-    np.save(os.path.join(path_prefix, 'out', 'allprob-'+str(model_iter)+'.npy'), allprob)
+    np.save(os.path.join(path_prefix, 'out', 'allprob.npy'), allprob)
     allans = np.load(os.path.join(path_prefix, 'data', 'allans.npy'))
 
     # caculate the pr curve area
