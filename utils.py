@@ -22,8 +22,8 @@ def construct_data(sen_num, words, pos1, pos2, blank, num_steps):
             j = len(sentence_set)
             while j < sen_num:
                 blank_sentence = [blank for x in range(num_steps)]
-                zero_pos1 = [-1 for x in range(num_steps)]
-                zero_pos2 = [-1 for x in range(num_steps)]
+                zero_pos1 = [0 for x in range(num_steps)]
+                zero_pos2 = [0 for x in range(num_steps)]
                 sentence_set.append(blank_sentence)
                 pos1_set.append(zero_pos1)
                 pos2_set.append(zero_pos2)

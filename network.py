@@ -43,15 +43,15 @@ class BGRU_2ATT:
         return k.reshape(x, shape=(-1, self.sen_num, self.num_steps, self.gru_size))
 
     def model(self):
-        words_embedding_layer = Embedding(len(self.word_embeddings), len(self.word_embeddings[0]),
+        words_embedding_layer = Embedding(len(self.word_embeddings)+1, len(self.word_embeddings[0]),
                                           weights=[self.word_embeddings], trainable=True,
-                                          embeddings_regularizer=l2(self.rate))
+                                          embeddings_regularizer=l2(self.rate), mask_zero=True)
 
-        pos1_embedding_layer = Embedding(self.pos_num, self.pos_size, embeddings_initializer='glorot_uniform',
-                                         trainable=True, embeddings_regularizer=l2(self.rate))
+        pos1_embedding_layer = Embedding(self.pos_num+1, self.pos_size, embeddings_initializer='glorot_uniform',
+                                         trainable=True, embeddings_regularizer=l2(self.rate), mask_zero=True)
 
-        pos2_embedding_layer = Embedding(self.pos_num, self.pos_size, embeddings_initializer='glorot_uniform',
-                                         trainable=True, embeddings_regularizer=l2(self.rate))
+        pos2_embedding_layer = Embedding(self.pos_num+1, self.pos_size, embeddings_initializer='glorot_uniform',
+                                         trainable=True, embeddings_regularizer=l2(self.rate), mask_zero=True)
 
         BGRU_layer = Bidirectional(GRU(units=self.gru_size, return_sequences=True, dropout=1 - self.keep_prob,
                                        kernel_regularizer=l2(self.rate),
@@ -61,13 +61,13 @@ class BGRU_2ATT:
         input_pos2 = Input(shape=(self.sen_num, self.num_steps), name='input_pos2')
         # self.input_y = Input(shape=(self.num_classes,), name='input_y')
 
-        input_words_mask = Masking(mask_value=-1, name='mask_word')(input_words)
-        input_pos1_mask = Masking(mask_value=-1, name='mask_pos1')(input_pos1)
-        input_pos2_mask = Masking(mask_value=-1, name='mask_pos2')(input_pos2)
+        # input_words_mask = Masking(mask_value=-1, name='mask_word')(input_words)
+        # input_pos1_mask = Masking(mask_value=-1, name='mask_pos1')(input_pos1)
+        # input_pos2_mask = Masking(mask_value=-1, name='mask_pos2')(input_pos2)
 
-        words_embedding = words_embedding_layer(input_words_mask)
-        pos1_embedding = pos1_embedding_layer(input_pos1_mask)
-        pos2_embedding = pos2_embedding_layer(input_pos2_mask)
+        words_embedding = words_embedding_layer(input_words)
+        pos1_embedding = pos1_embedding_layer(input_pos1)
+        pos2_embedding = pos2_embedding_layer(input_pos2)
         concat_embedding = concatenate([words_embedding, pos1_embedding, pos2_embedding])  # N, sen_num, steps, d
         # print(concat_embedding.shape)
 

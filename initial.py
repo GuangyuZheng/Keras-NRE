@@ -7,7 +7,7 @@ path_prefix = os.getcwd()
 
 data_setting = network.Settings()
 sen_num = data_setting.sen_num
-padding_id = -1
+padding_id = 0
 
 
 # embedding the position
@@ -36,6 +36,13 @@ def init():
     print('reading word embedding data...')
     vec = []
     word2id = {}
+
+    word2id['BLANK'] = 0
+    word2id['UNK'] = 0
+    # add embedding for UNK and BLANK
+    # dim = 50
+    # vec.append(np.random.normal(size=dim, loc=0, scale=0.05))
+
     f = open(os.path.join(path_prefix, 'origin_data', 'vec.txt'), 'r', encoding="utf-8")
     f.readline()
     while True:
@@ -43,19 +50,12 @@ def init():
         if content == '':
             break
         content = content.strip().split()
-        word2id[content[0]] = len(word2id)
+        word2id[content[0]] = len(word2id) - 1
         content = content[1:]
         content = [(float)(i) for i in content]
         vec.append(content)
     f.close()
-    word2id['UNK'] = len(word2id)
-    word2id['BLANK'] = len(word2id)
-    # padding_id = word2id['BLANK']
 
-    dim = 50
-    # add embedding for UNK and BLANK
-    vec.append(np.random.normal(size=dim, loc=0, scale=0.05))
-    vec.append(np.random.normal(size=dim, loc=0, scale=0.05))
     vec = np.array(vec, dtype=np.float32)
 
     print('reading relation to id')
