@@ -1,9 +1,8 @@
 from keras import backend as k
 from keras.models import Model
-from keras.layers import Input, Embedding, GRU, Bidirectional, concatenate, Lambda, Masking, Reshape
-from keras.layers import TimeDistributed
+from keras.layers import Input, Embedding, GRU, Bidirectional, concatenate, Lambda, Masking
 from custom_layers import WordLevelAttentionLayer, SentenceLevelAttentionLayer
-from keras import regularizers
+from keras.regularizers import l2
 
 
 class Settings(object):
@@ -45,17 +44,18 @@ class BGRU_2ATT:
 
     def model(self):
         words_embedding_layer = Embedding(len(self.word_embeddings), len(self.word_embeddings[0]),
-                                          weights=[self.word_embeddings], trainable=False)
+                                          weights=[self.word_embeddings], trainable=True,
+                                          embeddings_regularizer=l2(self.rate))
 
         pos1_embedding_layer = Embedding(self.pos_num, self.pos_size, embeddings_initializer='glorot_uniform',
-                                         trainable=True, embeddings_regularizer=regularizers.l2(self.rate))
+                                         trainable=True, embeddings_regularizer=l2(self.rate))
 
         pos2_embedding_layer = Embedding(self.pos_num, self.pos_size, embeddings_initializer='glorot_uniform',
-                                         trainable=True, embeddings_regularizer=regularizers.l2(self.rate))
+                                         trainable=True, embeddings_regularizer=l2(self.rate))
 
         BGRU_layer = Bidirectional(GRU(units=self.gru_size, return_sequences=True, dropout=1 - self.keep_prob,
-                                       kernel_regularizer=regularizers.l2(self.rate),
-                                       bias_regularizer=regularizers.l2(self.rate)), merge_mode='sum')
+                                       kernel_regularizer=l2(self.rate),
+                                       bias_regularizer=l2(self.rate)), merge_mode='sum')
         input_words = Input(shape=(self.sen_num, self.num_steps), name='input_words')
         input_pos1 = Input(shape=(self.sen_num, self.num_steps), name='input_pos1')
         input_pos2 = Input(shape=(self.sen_num, self.num_steps), name='input_pos2')
@@ -71,7 +71,7 @@ class BGRU_2ATT:
         concat_embedding = concatenate([words_embedding, pos1_embedding, pos2_embedding])  # N, sen_num, steps, d
         # print(concat_embedding.shape)
 
-        concat_embedding = Lambda(self.flatten)(concat_embedding)
+        concat_embedding = Lambda(self.flatten, name='flatten')(concat_embedding)
         output_h = BGRU_layer(concat_embedding)  # N * sen_num, step, gru_size
         output_h = Lambda(self.reshape, name='reshape')(output_h)  # N, sen_num, step, gru_size
         # print(output_h.shape)

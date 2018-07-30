@@ -1,6 +1,7 @@
 import tensorflow as tf
 from keras import backend as k
 from keras.engine.topology import Layer
+from keras.regularizers import l2
 
 
 # input shape: N, sen_num, num_steps, gru_size
@@ -13,7 +14,7 @@ class WordLevelAttentionLayer(Layer):
     def build(self, input_shape):
         # print(input_shape)
         self.attention_w = self.add_weight(name='attention_omega', shape=(input_shape[-1], 1),
-                                           initializer='glorot_uniform', trainable=True)
+                                           initializer='glorot_uniform', trainable=True, regularizer=l2(0.0001))
         super(WordLevelAttentionLayer, self).build(input_shape)
 
     def call(self, inputs, **kwargs):
@@ -46,12 +47,13 @@ class SentenceLevelAttentionLayer(Layer):
     def build(self, input_shape):
         self.gru_size = input_shape[-1]
         self.sen_a = self.add_weight(name='attention_A', shape=(self.gru_size,), initializer='glorot_uniform',
-                                     trainable=True)
+                                     trainable=True, regularizer=l2(0.0001))
         self.sen_r = self.add_weight(name='query_r', shape=(self.gru_size, 1), initializer='glorot_uniform',
-                                     trainable=True)
+                                     trainable=True, regularizer=l2(0.0001))
         self.relation_embedding = self.add_weight(name='relation_embedding', shape=(self.num_classes, self.gru_size),
-                                                  initializer='glorot_uniform', trainable=True)
-        self.sen_d = self.add_weight(name='bias_d', shape=(self.num_classes,), initializer='glorot_uniform', trainable=True)
+                                                  initializer='glorot_uniform', trainable=True, regularizer=l2(0.0001))
+        self.sen_d = self.add_weight(name='bias_d', shape=(self.num_classes,), initializer='glorot_uniform',
+                                     trainable=True, regularizer=l2(0.0001))
 
         super(SentenceLevelAttentionLayer, self).build(input_shape)
 
