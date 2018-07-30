@@ -8,7 +8,7 @@ from keras.regularizers import l2
 # output shape: N, sen_num, gru_size
 class WordLevelAttentionLayer(Layer):
     def __init__(self, **kwargs):
-        # self.supports_masking = True
+        self.supports_masking = True
         super(WordLevelAttentionLayer, self).__init__(**kwargs)
 
     def build(self, input_shape):
@@ -32,6 +32,12 @@ class WordLevelAttentionLayer(Layer):
         # print(type(attention_r))
         return attention_r
 
+    def compute_mask(self, inputs, mask=None):
+        if mask is not None:
+            assert inputs.shape == mask.shape
+            mask = mask[:, :, -1]
+        return mask
+
     def compute_output_shape(self, input_shape):
         return (input_shape[0], input_shape[1], input_shape[-1])
 
@@ -40,7 +46,7 @@ class WordLevelAttentionLayer(Layer):
 # output shape: sample, num_classes
 class SentenceLevelAttentionLayer(Layer):
     def __init__(self, num_classes, **kwargs):
-        # self.supports_masking = True
+        self.supports_masking = True
         self.num_classes = num_classes
         super(SentenceLevelAttentionLayer, self).__init__(**kwargs)
 
@@ -57,21 +63,54 @@ class SentenceLevelAttentionLayer(Layer):
 
         super(SentenceLevelAttentionLayer, self).build(input_shape)
 
-    def call(self, inputs, **kwargs):
-        sen_repre = k.tanh(inputs)  # sample, sen_num, gru_size
-        # print(inputs.shape)
-        # print(self.sen_a.shape)
-        e = k.dot(sen_repre * self.sen_a, self.sen_r)  # sample, sen_num, 1
-        sen_alpha = k.exp(e)
-        sen_alpha /= k.cast(k.sum(sen_alpha, axis=1, keepdims=True) + k.epsilon(), k.floatx())  # sample, sen_num, 1
-        # print(sen_alpha.shape)
-        sen_s = k.batch_dot(sen_alpha, sen_repre, axes=[0, 1])  # sample, gru_size
-        # print(sen_s.shape)
-        sen_out = k.dot(sen_s, k.transpose(self.relation_embedding)) + self.sen_d
-        sen_out = k.softmax(sen_out)
-        sen_out = k.reshape(sen_out, shape=(-1, self.num_classes))
-        # print(sen_out.shape)
+    def call(self, inputs, mask=None):
+        if mask is not None:
+            inputs = inputs * mask
+            sen_repre = k.tanh(inputs)  # sample, sen_num, gru_size
+            # print(inputs.shape)
+            # print(self.sen_a.shape)
+            e = k.dot(sen_repre * self.sen_a, self.sen_r)  # sample, sen_num, 1
+            e = k.squeeze(e, axis=-1)  # sample, sen_num
+            mask = (e != 0)
+            sen_alpha = self.masked_softmax(e, mask)  # sample, sen_num
+            # sen_alpha = k.exp(e)
+            # sen_alpha /= k.cast(k.sum(sen_alpha, axis=1, keepdims=True) + k.epsilon(), k.floatx())  # sample, sen_num, 1
+            # print(sen_alpha.shape)
+            sen_s = k.batch_dot(sen_alpha, sen_repre)  # sample, gru_size
+            # print(sen_s.shape)
+            sen_out = k.dot(sen_s, k.transpose(self.relation_embedding)) + self.sen_d  # sample, num_classes
+            sen_out = k.softmax(sen_out)
+            sen_out = k.reshape(sen_out, shape=(-1, self.num_classes))
+            # print(sen_out.shape)
+        else:
+            sen_repre = k.tanh(inputs)  # sample, sen_num, gru_size
+            # print(inputs.shape)
+            # print(self.sen_a.shape)
+            e = k.dot(sen_repre * self.sen_a, self.sen_r)  # sample, sen_num, 1
+            e = k.squeeze(e, axis=-1) # sample, sen_num
+            sen_alpha = k.exp(e)
+            sen_alpha /= k.cast(k.sum(sen_alpha, axis=1, keepdims=True) + k.epsilon(), k.floatx())  # sample, sen_num
+            # print(sen_alpha.shape)
+            sen_s = k.batch_dot(sen_alpha, sen_repre)  # sample, gru_size
+            # print(sen_s.shape)
+            sen_out = k.dot(sen_s, k.transpose(self.relation_embedding)) + self.sen_d  # sample, num_classes
+            sen_out = k.softmax(sen_out)
+            sen_out = k.reshape(sen_out, shape=(-1, self.num_classes))
+            # print(sen_out.shape)
         return sen_out
+
+    def masked_softmax(self, vec, mask, dim=1):
+        masked_vec = vec * mask
+        max_vec = k.max(masked_vec, axis=dim, keepdims=True)[0]
+        exps = k.exp(masked_vec - max_vec)
+        masked_exps = exps * mask
+        masked_sums = k.sum(masked_exps, axis=dim, keepdims=True)
+        zeros = (masked_sums == 0)
+        masked_sums += zeros
+        return masked_exps / masked_sums
+
+    def compute_mask(self, inputs, mask=None):
+        return None
 
     def compute_output_shape(self, input_shape):
         return (input_shape[0], self.num_classes)

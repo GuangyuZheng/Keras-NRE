@@ -40,8 +40,8 @@ def init():
     word2id['BLANK'] = 0
     word2id['UNK'] = 0
     # add embedding for UNK and BLANK
-    # dim = 50
-    # vec.append(np.random.normal(size=dim, loc=0, scale=0.05))
+    dim = 50
+    vec.append(np.random.normal(size=dim, loc=0, scale=0.05))
 
     f = open(os.path.join(path_prefix, 'origin_data', 'vec.txt'), 'r', encoding="utf-8")
     f.readline()

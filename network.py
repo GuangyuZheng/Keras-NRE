@@ -43,7 +43,7 @@ class BGRU_2ATT:
         return k.reshape(x, shape=(-1, self.sen_num, self.num_steps, self.gru_size))
 
     def model(self):
-        words_embedding_layer = Embedding(len(self.word_embeddings)+1, len(self.word_embeddings[0]),
+        words_embedding_layer = Embedding(len(self.word_embeddings), len(self.word_embeddings[0]),
                                           weights=[self.word_embeddings], trainable=True,
                                           embeddings_regularizer=l2(self.rate), mask_zero=True)
 
