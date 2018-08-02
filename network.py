@@ -1,7 +1,7 @@
 from keras import backend as k
 from keras.models import Model
 from keras.layers import Input, Embedding, GRU, Bidirectional, concatenate, Lambda, Masking
-from custom_layers import WordLevelAttentionLayer, SentenceLevelAttentionLayer
+from custom_layers import WordLevelAttentionLayer, SentenceLevelAttentionLayer, FlattenLayer, ReshapeLayer
 from keras.regularizers import l2
 
 
@@ -61,19 +61,16 @@ class BGRU_2ATT:
         input_pos2 = Input(shape=(self.sen_num, self.num_steps), name='input_pos2')
         # self.input_y = Input(shape=(self.num_classes,), name='input_y')
 
-        # input_words_mask = Masking(mask_value=-1, name='mask_word')(input_words)
-        # input_pos1_mask = Masking(mask_value=-1, name='mask_pos1')(input_pos1)
-        # input_pos2_mask = Masking(mask_value=-1, name='mask_pos2')(input_pos2)
-
         words_embedding = words_embedding_layer(input_words)
         pos1_embedding = pos1_embedding_layer(input_pos1)
         pos2_embedding = pos2_embedding_layer(input_pos2)
         concat_embedding = concatenate([words_embedding, pos1_embedding, pos2_embedding])  # N, sen_num, steps, d
-        # print(concat_embedding.shape)
 
-        concat_embedding = Lambda(self.flatten, name='flatten')(concat_embedding)
+        # concat_embedding = Lambda(self.flatten, name='flatten')(concat_embedding)
+        concat_embedding = FlattenLayer()(concat_embedding)
         output_h = BGRU_layer(concat_embedding)  # N * sen_num, step, gru_size
-        output_h = Lambda(self.reshape, name='reshape')(output_h)  # N, sen_num, step, gru_size
+        # output_h = Lambda(self.reshape, name='reshape')(output_h)  # N, sen_num, step, gru_size
+        output_h = ReshapeLayer(self.sen_num)(output_h)
         # print(output_h.shape)
 
         attention_r = WordLevelAttentionLayer()(output_h)
