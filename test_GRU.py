@@ -61,7 +61,7 @@ def eval_pn(test_y, test_word, test_pos1, test_pos2):
 
 if __name__ == '__main__':
     # ATTENTION: change pathname before you load your model
-    test_epochs = [6, 7, 10]
+    test_epochs = [6]
     for epoch in test_epochs:
         if epoch < 10:
             epoch = '0' + str(epoch)
